@@ -3,9 +3,10 @@ import httpx
 
 
 
-async def connect_api(url: str):
+async def connect_api(url: str) -> Optional[dict]:
     async with httpx.AsyncClient() as client:
         response = await client.get(url)
+        
         response.raise_for_status()
 
     data = response.json()
