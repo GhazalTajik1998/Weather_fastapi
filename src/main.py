@@ -5,14 +5,20 @@ from pathlib import Path
 from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException
-
+from beanie import init_beanie
+from motor.motor_asyncio import AsyncIOMotorClient
 import uvicorn
 
 from services.openWeather import routers 
+from core.config import settings
+
 
 
 def get_application() -> FastAPI:
-    application = FastAPI()
+    application = FastAPI(
+        title=settings.PROJECT_NAME,
+        openapi_url=f"{settings.API_V1_STR}/openapi.json"
+    )
 
     return application
 

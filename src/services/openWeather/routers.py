@@ -7,8 +7,6 @@ from .api_utils import connect_api
 
 
 api_key: Optional[str] = None
-
-
 router = APIRouter()
 
 async def get_geo_by_city(city: str, country: Optional[str] = None) -> Optional[str]:
