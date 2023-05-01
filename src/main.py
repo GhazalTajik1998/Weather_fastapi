@@ -1,4 +1,6 @@
 import logging
+import json
+from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
@@ -6,14 +8,13 @@ from starlette.exceptions import HTTPException
 
 import uvicorn
 
+from services.openWeather import routers 
+
 
 def get_application() -> FastAPI:
     application = FastAPI()
 
     return application
-
-
-
 
 app = get_application()
 
@@ -21,7 +22,7 @@ def run_application():
     try:
         uvicorn.run(
             "main:app",
-            host="0.0.0.0",
+            host="127.0.0.1",
             port=8000,
             reload=True,
         )
@@ -30,6 +31,28 @@ def run_application():
         logging.exception(e)
 
 
-if __name__ == "__main__":
-    run_application()
+def configure():
+    configure_routing()
+    configure_api_keys()
+
+def configure_api_keys():
+    file = Path('settings.json').absolute()
+
+    if not file.exists():
+        raise Exception("settings.json file not found, you cannot continue, please see settings_template.json")
+
+    with open(file) as fin:
+        settings = json.load(fin)
+        routers.api_key = settings.get('api_key')
+
+def configure_routing():
     
+    app.include_router(routers.router)
+    print(app.route)
+
+if __name__ == "__main__":
+    configure() 
+    run_application()
+ 
+else: 
+    configure()
