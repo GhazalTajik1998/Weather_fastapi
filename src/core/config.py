@@ -14,6 +14,7 @@ class Settings(BaseSettings):
     PROJECT_NAME: str = "WEATHERAPI"
 
     # Database
+    MONGO_CONNECTION_STRING: str = config("MONGO_CONNECTION_STRING", cast=str)
 
 
     class Config:

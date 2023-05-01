@@ -5,14 +5,15 @@ from pathlib import Path
 from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException
-from beanie import init_beanie
+from beanie.odm.utils.init import init_beanie
+
 from motor.motor_asyncio import AsyncIOMotorClient
 import uvicorn
 
-from services.openWeather import routers 
+from api.weather import weather_api 
 from core.config import settings
-
-
+from models.user_model import User
+from api.router import router
 
 def get_application() -> FastAPI:
     application = FastAPI(
@@ -43,18 +44,26 @@ def configure():
 
 def configure_api_keys():
     file = Path('settings.json').absolute()
-
     if not file.exists():
         raise Exception("settings.json file not found, you cannot continue, please see settings_template.json")
-
     with open(file) as fin:
         settings = json.load(fin)
-        routers.api_key = settings.get('api_key')
+        weather_api.api_key = settings.get('api_key')
 
-def configure_routing():
-    
-    app.include_router(routers.router)
-    print(app.route)
+def configure_routing():  
+    app.include_router(router, prefix=settings.API_V1_STR)
+
+@app.on_event("startup")
+async def app_init():
+    db = AsyncIOMotorClient(settings.MONGO_CONNECTION_STRING, uuidRepresentation="standard")
+    db = db["weather"]
+    await init_beanie(
+        database = db,
+        document_models = [
+            User,
+        ]
+    )
+
 
 if __name__ == "__main__":
     configure() 
@@ -62,3 +71,4 @@ if __name__ == "__main__":
  
 else: 
     configure()
+      

@@ -11,5 +11,3 @@ async def connect_api(url: str) -> Optional[dict]:
 
     data = response.json()
     return data
-
-
