@@ -9,7 +9,7 @@ services:
       DATABASE_URL: "mongodb://db:27017/weather"
     depends_on:
       - db
-    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+    command: pytest && uvicorn main:app --host 0.0.0.0 --port 8000 --reload
   db:
     image: mongo:latest
     ports:
